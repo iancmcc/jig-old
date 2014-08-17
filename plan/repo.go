@@ -9,7 +9,7 @@ import (
 type Repo struct {
 	FullName string  `json:"name"`
 	RefSpec  string  `json:"ref"`
-	UserType vcsType `json:"type"`
+	UserType vcsType `json:"type,omitempty"`
 }
 
 func splitFullName(fullname string) ([]string, error) {

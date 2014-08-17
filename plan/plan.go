@@ -28,3 +28,8 @@ func (p *Plan) setRepoNames() {
 		repo.FullName = name
 	}
 }
+
+func (p *Plan) ToJSON(writer io.Writer) error {
+	encoder := json.NewEncoder(writer)
+	return encoder.Encode(p)
+}
