@@ -28,6 +28,20 @@ var _ = Describe("Repo", func() {
 				Expect(repo.Repository()).To(Equal("jig"))
 			})
 
+			It("should detect that github.com is git repos", func() {
+				Expect(repo.VCSType()).To(Equal(GIT))
+			})
+
+			Context("the VCS type is specified", func() {
+				BeforeEach(func() {
+					repo.UserType = "subversion"
+				})
+
+				It("should use the specified VCS type", func() {
+					Expect(repo.VCSType()).To(Equal(SVN))
+				})
+			})
+
 		})
 
 		Context("the name is not well formed", func() {

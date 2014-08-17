@@ -51,4 +51,20 @@ var _ = Describe("Plan", func() {
 			})
 		})
 	})
+
+	Describe("parsing user-specified VCS", func() {
+		BeforeEach(func() {
+			plan, err = NewPlanFromJSON(strings.NewReader(`{
+				"repos": {
+					"github.com/iancmcc/jig": {
+						"type": "subversion"
+					}
+				}
+			}`))
+		})
+		It("should return the user-specified type", func() {
+			repo := plan.Repos["github.com/iancmcc/jig"]
+			Expect(repo.VCSType()).To(Equal(SVN))
+		})
+	})
 })

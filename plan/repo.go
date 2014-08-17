@@ -5,8 +5,11 @@ import (
 	"strings"
 )
 
+// Repo represents a version control repository.
 type Repo struct {
-	FullName string `json:"name"`
+	FullName string  `json:"name"`
+	RefSpec  string  `json:"ref"`
+	UserType vcsType `json:"type"`
 }
 
 func splitFullName(fullname string) ([]string, error) {
@@ -45,4 +48,10 @@ func (r *Repo) Repository() (string, error) {
 		return "", err
 	}
 	return split[2], nil
+}
+
+// VCSType returns the VCS type of the repository. It will autodetect from
+// the repository's registry, or use a user-specified one.
+func (r *Repo) VCSType() (vcsType, error) {
+	return guessVCSType(r)
 }
