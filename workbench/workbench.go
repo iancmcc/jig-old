@@ -46,12 +46,41 @@ func (b *Workbench) Initialize() error {
 	if err := b.ensureDirectories(); err != nil {
 		return err
 	}
+	if err := b.initializePlan(); err != nil {
+		return err
+	}
 	return nil
 }
 
+// Plan returns the bench's current plan
+func (b *Workbench) Plan() *plan.Plan {
+	return b.plan
+}
+
 func (b *Workbench) initializePlan() error {
+	var p *plan.Plan
 	filename := filepath.Join(b.MetadataDir(), "plan")
-	f, err := os.Open(filename)
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		// File doesn't exist yet; initialize with a new Plan
+		f, err := os.Create(filename)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		p = plan.NewPlan()
+		p.ToJSON(f)
+	} else {
+		f, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		p, err = plan.NewPlanFromJSON(f)
+		if err != nil {
+			return err
+		}
+	}
+	b.plan = p
+	return nil
 }
 
 func (b *Workbench) ensureDirectories() error {

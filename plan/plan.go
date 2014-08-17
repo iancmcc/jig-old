@@ -10,6 +10,10 @@ type Plan struct {
 	Repos map[string]*Repo `json:"repos"`
 }
 
+func NewPlan() *Plan {
+	return &Plan{}
+}
+
 // NewPlanFromJSON creates a Plan from JSON.
 func NewPlanFromJSON(reader io.Reader) (*Plan, error) {
 	var plan Plan

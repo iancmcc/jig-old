@@ -68,6 +68,13 @@ var _ = Describe("Workbench", func() {
 			verifyDirs()
 		})
 
+		It("should create a valid plan", func() {
+			Expect(bench.Plan()).ToNot(BeNil())
+			st, err := os.Stat(filepath.Join(bench.MetadataDir(), "plan"))
+			Expect(st).ToNot(BeNil())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
 		Context("existing directories", func() {
 			BeforeEach(func() {
 				os.MkdirAll(bench.MetadataDir(), 0755)
