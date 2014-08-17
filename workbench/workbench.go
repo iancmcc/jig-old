@@ -57,6 +57,23 @@ func (b *Workbench) Plan() *plan.Plan {
 	return b.plan
 }
 
+// AddRepository adds a repository to the workbench and saves the plan.
+func (b *Workbench) AddRepository(r *plan.Repo) error {
+	b.Plan().Repos[r.FullName] = r
+	return b.save()
+}
+
+func (b *Workbench) save() error {
+	filename := filepath.Join(b.MetadataDir(), "plan")
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	b.Plan().ToJSON(f)
+	return nil
+}
+
 func (b *Workbench) initializePlan() error {
 	var p *plan.Plan
 	filename := filepath.Join(b.MetadataDir(), "plan")

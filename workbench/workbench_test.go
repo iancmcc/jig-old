@@ -4,8 +4,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 
+	"github.com/iancmcc/jig/plan"
 	. "github.com/iancmcc/jig/workbench"
 
 	. "github.com/onsi/ginkgo"
@@ -87,6 +89,34 @@ var _ = Describe("Workbench", func() {
 			})
 		})
 
+	})
+
+	Context("initializing an existing workbench", func() {
+
+		var origPlan *plan.Plan
+
+		BeforeEach(func() {
+			origPlan, _ = plan.NewPlanFromJSON(strings.NewReader(`{
+				"repos": {
+					"github.com/iancmcc/jig": {
+						"ref": "develop"
+					},
+					"github.com/iancmcc/dotfiles": {
+						"type": "subversion"
+					}
+				}
+			}`))
+			bench.Initialize()
+			f, _ := os.Create(filepath.Join(bench.MetadataDir(), "plan"))
+			defer f.Close()
+			origPlan.ToJSON(f)
+			bench = NewWorkbench(dirname)
+			bench.Initialize()
+		})
+
+		It("should recreate the existing plan", func() {
+			Expect(bench.Plan()).To(Equal(origPlan))
+		})
 	})
 
 })
