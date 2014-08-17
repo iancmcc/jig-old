@@ -30,6 +30,10 @@ func (p *Plan) setRepoNames() {
 }
 
 func (p *Plan) ToJSON(writer io.Writer) error {
-	encoder := json.NewEncoder(writer)
-	return encoder.Encode(p)
+	if indented, err := json.MarshalIndent(p, "", "    "); err != nil {
+		return err
+	} else {
+		writer.Write(indented)
+	}
+	return nil
 }
