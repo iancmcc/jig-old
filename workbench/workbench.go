@@ -96,6 +96,9 @@ func (b *Workbench) initializePlan() error {
 			return err
 		}
 	}
+	if p.Repos == nil {
+		p.Repos = make(map[string]*plan.Repo)
+	}
 	b.plan = p
 	return nil
 }
