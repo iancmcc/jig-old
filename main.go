@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/codegangsta/cli"
 	"github.com/iancmcc/jig/plan"
@@ -18,11 +19,23 @@ func Initialize(ctx *cli.Context) {
 	}
 	bench := workbench.NewWorkbench(pwd)
 	bench.Initialize()
-	repo := &plan.Repo{FullName: "github.com/zenoss/platform-build"}
-	bench.AddRepository(repo)
 
-	srcrepo, _ := vcs.NewSourceRepository(repo, bench.SrcRoot())
-	srcrepo.Create()
+	bench.AddRepository(&plan.Repo{FullName: "github.com/control-center/serviced"})
+	bench.AddRepository(&plan.Repo{FullName: "github.com/zenoss/platform-build"})
+	bench.AddRepository(&plan.Repo{FullName: "github.com/iancmcc/dotfiles"})
+
+	var wg sync.WaitGroup
+	for name, r := range bench.Plan().Repos {
+		wg.Add(1)
+		go func(name string, r *plan.Repo) {
+			defer wg.Done()
+			fmt.Println("Starting clone of", name)
+			srcrepo, _ := vcs.NewSourceRepository(r, bench.SrcRoot())
+			srcrepo.Create()
+			fmt.Println("Done with", name)
+		}(name, r)
+	}
+	wg.Wait()
 }
 
 func main() {

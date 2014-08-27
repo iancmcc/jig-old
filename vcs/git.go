@@ -45,16 +45,21 @@ func credentialsCallback(url string, username_from_url string, allowed_types git
 	return i, &cred
 }
 
+func progressCallback(stats git.TransferProgress) int {
+	//fmt.Printf("%+v", stats)
+	return 0
+}
+
 func (r *GitRepository) Create() error {
 	// TODO: Allow git to specify its protocol; use SSH only for now
 	url := "git@" + r.site + ":" + r.owner + "/" + r.name
-	fmt.Printf("url: %s", url)
 	opts := &git.CloneOptions{
 		CheckoutOpts: &git.CheckoutOpts{
 			Strategy: git.CheckoutSafeCreate,
 		},
 		RemoteCallbacks: &git.RemoteCallbacks{
 			CredentialsCallback: credentialsCallback,
+			//TransferProgressCallback: progressCallback,
 		},
 	}
 	_, err := git.Clone(url, r.path, opts)
