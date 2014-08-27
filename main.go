@@ -18,7 +18,7 @@ func Initialize(ctx *cli.Context) {
 	}
 	bench := workbench.NewWorkbench(pwd)
 	bench.Initialize()
-	repo := &plan.Repo{FullName: "github.com/iancmcc/dotfiles"}
+	repo := &plan.Repo{FullName: "github.com/zenoss/platform-build"}
 	bench.AddRepository(repo)
 
 	srcrepo, _ := vcs.NewSourceRepository(repo, bench.SrcRoot())
