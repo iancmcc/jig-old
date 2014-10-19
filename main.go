@@ -20,20 +20,23 @@ func Initialize(ctx *cli.Context) {
 	bench := workbench.NewWorkbench(pwd)
 	bench.Initialize()
 
-	bench.AddRepository(&plan.Repo{FullName: "github.com/control-center/serviced"})
-	bench.AddRepository(&plan.Repo{FullName: "github.com/zenoss/platform-build"})
-	bench.AddRepository(&plan.Repo{FullName: "github.com/iancmcc/dotfiles"})
+	r, _ := plan.NewRepo("git@github.com:zenoss/platform-build")
+	fmt.Printf("%+v", r)
+	bench.AddRepository(&r)
 
 	var wg sync.WaitGroup
 	for name, r := range bench.Plan().Repos {
-		wg.Add(1)
-		go func(name string, r *plan.Repo) {
-			defer wg.Done()
-			fmt.Println("Starting clone of", name)
-			srcrepo, _ := vcs.NewSourceRepository(r, bench.SrcRoot())
-			srcrepo.Create()
-			fmt.Println("Done with", name)
-		}(name, r)
+		if name != "" {
+			wg.Add(1)
+			go func(name string, r *plan.Repo) {
+				defer wg.Done()
+				fmt.Println("Starting clone of", name)
+				srcrepo, _ := vcs.NewSourceRepository(r, bench.SrcRoot())
+				fmt.Printf("SRCREPO: %+v", srcrepo)
+				srcrepo.Create()
+				fmt.Println("Done with", name)
+			}(name, r)
+		}
 	}
 	wg.Wait()
 }

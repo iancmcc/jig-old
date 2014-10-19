@@ -11,11 +11,12 @@ import (
 var _ SourceRepository = &GitRepository{}
 
 type GitRepository struct {
-	site  string
-	owner string
-	name  string
-	path  string
-	url   string
+	path string
+	url  string
+}
+
+func NewGitRepository(path, url string) *GitRepository {
+	return &GitRepository{path, url}
 }
 
 func file_exists(filename string) bool {
@@ -27,17 +28,20 @@ func getSSHFiles() (string, string, error) {
 	dsa_pub := os.ExpandEnv("$HOME/.ssh/id_dsa.pub")
 	dsa_key := os.ExpandEnv("$HOME/.ssh/id_dsa")
 	if file_exists(dsa_key) && file_exists(dsa_pub) {
+		fmt.Printf("FILES YO")
 		return dsa_pub, dsa_key, nil
 	}
 	rsa_pub := os.ExpandEnv("$HOME/.ssh/id_rsa.pub")
 	rsa_key := os.ExpandEnv("$HOME/.ssh/id_rsa")
 	if file_exists(rsa_key) && file_exists(rsa_pub) {
+		fmt.Printf("RSA FILES YO")
 		return rsa_pub, rsa_key, nil
 	}
 	return "", "", fmt.Errorf("No SSH keys could be found")
 }
 
 func credentialsCallback(url string, username_from_url string, allowed_types git.CredType) (int, *git.Cred) {
+	fmt.Printf("url: %s, username_from_url: %s; allowed: %+v", url, username_from_url, allowed_types)
 	pub, key, err := getSSHFiles()
 	if err != nil {
 		return 0, nil
@@ -46,24 +50,32 @@ func credentialsCallback(url string, username_from_url string, allowed_types git
 	return i, &cred
 }
 
+func certCheckCallback(cert *git.Certificate, valid bool, hostname string) int {
+	// Don't bother checking any certs, just go with it if valid
+	if valid {
+		return 1
+	}
+	return 0
+}
+
 func progressCallback(stats git.TransferProgress) int {
-	//fmt.Printf("%+v", stats)
+	fmt.Printf("%+v", stats)
 	return 0
 }
 
 func (r *GitRepository) Create() error {
 	// TODO: Allow git to specify its protocol; use SSH only for now
-	url := "git@" + r.site + ":" + r.owner + "/" + r.name
 	opts := &git.CloneOptions{
 		CheckoutOpts: &git.CheckoutOpts{
 			Strategy: git.CheckoutSafeCreate,
 		},
 		RemoteCallbacks: &git.RemoteCallbacks{
-			CredentialsCallback: credentialsCallback,
-			//TransferProgressCallback: progressCallback,
+			CertificateCheckCallback: certCheckCallback,
+			CredentialsCallback:      credentialsCallback,
+			TransferProgressCallback: progressCallback,
 		},
 	}
-	_, err := git.Clone(url, r.path, opts)
+	_, err := git.Clone(r.url, r.path, opts)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	}

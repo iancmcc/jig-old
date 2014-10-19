@@ -59,7 +59,7 @@ func (b *Workbench) Plan() *plan.Plan {
 
 // AddRepository adds a repository to the workbench and saves the plan.
 func (b *Workbench) AddRepository(r *plan.Repo) error {
-	b.Plan().Repos[r.FullName] = r
+	b.Plan().Repos[r.URI] = r
 	return b.save()
 }
 

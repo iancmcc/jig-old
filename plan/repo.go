@@ -25,7 +25,8 @@ func NewRepo(uri string) (Repo, error) {
 		// It's probably an Git SSH URL
 		// TODO: What else could it be? Be defensive
 		split := strings.Split(uri, ":")
-		parsed, err = url.Parse("git+ssh://" + split[0] + "/" + split[1])
+		nuri := "git+ssh://" + split[0] + "/" + split[1]
+		parsed, err = url.Parse(nuri)
 		if err != nil {
 			return repo, err
 		}

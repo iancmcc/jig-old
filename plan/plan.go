@@ -2,6 +2,7 @@ package plan
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 )
 
@@ -29,22 +30,19 @@ func NewPlanFromJSON(reader io.Reader) (*Plan, error) {
 func cleanUpPlan(p *Plan) (*Plan, error) {
 	newplan := NewPlan()
 	for uri, repo := range p.Repos {
+		fmt.Printf("cleanUpPlan(): Cleaning up %s\n", uri)
 		newrepo, err := NewRepo(uri)
 		if err != nil {
 			return nil, err
+		}
+		if repo.FullName != "" {
+			newrepo.FullName = repo.FullName
 		}
 		newrepo.RefSpec = repo.RefSpec
 		newrepo.UserType = repo.UserType
 		newplan.Repos[uri] = &newrepo
 	}
 	return newplan, nil
-}
-
-// setRepoNames updates all the repos in the Plan with their full names.
-func (p *Plan) setRepoNames() {
-	for name, repo := range p.Repos {
-		repo.URI = name
-	}
 }
 
 func (p *Plan) ToJSON(writer io.Writer) error {
