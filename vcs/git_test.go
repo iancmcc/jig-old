@@ -2,19 +2,35 @@ package vcs_test
 
 import (
 	"io/ioutil"
+	"runtime"
 	"testing"
 
 	. "github.com/iancmcc/jig/vcs"
+	"github.com/libgit2/git2go"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	//. "github.com/onsi/gomega"
 )
 
-func createTestRepo(t *testing.T) *Repository {
+func checkFatal(t *testing.T, err error) {
+	if err == nil {
+		return
+	}
+
+	// The failure happens at wherever we were called, not here
+	_, file, line, ok := runtime.Caller(1)
+	if !ok {
+		t.Fatal()
+	}
+
+	t.Fatalf("Fail at %v:%v; %v", file, line, err)
+}
+
+func createTestRepo(t *testing.T) *git.Repository {
 	// figure out where we can create the test repo
 	path, err := ioutil.TempDir("", "git2go")
 	checkFatal(t, err)
-	repo, err := InitRepository(path, false)
+	repo, err := git.InitRepository(path, false)
 	checkFatal(t, err)
 
 	tmpfile := "README"

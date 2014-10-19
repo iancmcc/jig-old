@@ -11,7 +11,7 @@ type Plan struct {
 }
 
 func NewPlan() *Plan {
-	return &Plan{}
+	return &Plan{make(map[string]*Repo)}
 }
 
 // NewPlanFromJSON creates a Plan from JSON.
@@ -22,14 +22,28 @@ func NewPlanFromJSON(reader io.Reader) (*Plan, error) {
 	if err != nil {
 		return nil, err
 	}
-	plan.setRepoNames()
-	return &plan, nil
+	return cleanUpPlan(&plan)
+}
+
+// cleanUpPlan will create a brand new Plan with proper names and URLs
+func cleanUpPlan(p *Plan) (*Plan, error) {
+	newplan := NewPlan()
+	for uri, repo := range p.Repos {
+		newrepo, err := NewRepo(uri)
+		if err != nil {
+			return nil, err
+		}
+		newrepo.RefSpec = repo.RefSpec
+		newrepo.UserType = repo.UserType
+		newplan.Repos[uri] = &newrepo
+	}
+	return newplan, nil
 }
 
 // setRepoNames updates all the repos in the Plan with their full names.
 func (p *Plan) setRepoNames() {
 	for name, repo := range p.Repos {
-		repo.FullName = name
+		repo.URI = name
 	}
 }
 

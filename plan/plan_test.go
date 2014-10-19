@@ -1,6 +1,7 @@
 package plan_test
 
 import (
+	"fmt"
 	"strings"
 
 	. "github.com/iancmcc/jig/plan"
@@ -19,10 +20,10 @@ var _ = Describe("Plan", func() {
 	BeforeEach(func() {
 		plan, err = NewPlanFromJSON(strings.NewReader(`{
 			"repos": {
-				"github.com/iancmcc/jig": {
+				"git@github.com:iancmcc/jig": {
 					"ref": "develop"
 				},
-				"github.com/iancmcc/dotfiles": {
+				"git@github.com:iancmcc/dotfiles": {
 					"type": "subversion"
 				}
 			}
@@ -33,16 +34,17 @@ var _ = Describe("Plan", func() {
 
 		Context("when the JSON parses successfully", func() {
 			It("should populate fields properly", func() {
-				repo := plan.Repos["github.com/iancmcc/jig"]
+				repo := plan.Repos["git@github.com:iancmcc/jig"]
+				fmt.Printf("%+v", plan)
 				Expect(repo.RefSpec).To(Equal("develop"))
 				Expect(repo.FullName).To(Equal("github.com/iancmcc/jig"))
 			})
 			It("should autodetect VCS type if possible", func() {
-				repo := plan.Repos["github.com/iancmcc/jig"]
+				repo := plan.Repos["git@github.com:iancmcc/jig"]
 				Expect(repo.VCSType()).To(Equal(GIT))
 			})
 			It("should respect user-specified VCS type", func() {
-				repo := plan.Repos["github.com/iancmcc/dotfiles"]
+				repo := plan.Repos["git@github.com:iancmcc/dotfiles"]
 				Expect(repo.VCSType()).To(Equal(SVN))
 			})
 

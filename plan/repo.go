@@ -2,6 +2,7 @@ package plan
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -10,10 +11,34 @@ type Repo struct {
 	FullName string  `json:"name"`
 	RefSpec  string  `json:"ref"`
 	UserType vcsType `json:"type,omitempty"`
+	URI      string  `json:"uri,omitempty"`
+	vcsType  string
+}
+
+func NewRepo(uri string) (Repo, error) {
+	var repo Repo
+	parsed, err := url.Parse(uri)
+	if err != nil {
+		return repo, err
+	}
+	if strings.Contains(parsed.Path, ":") {
+		// It's probably an Git SSH URL
+		// TODO: What else could it be? Be defensive
+		split := strings.Split(uri, ":")
+		parsed, err = url.Parse("git+ssh://" + split[0] + "/" + split[1])
+		if err != nil {
+			return repo, err
+		}
+	}
+	repo = Repo{
+		FullName: fmt.Sprintf("%s/%s", parsed.Host, strings.Trim(parsed.Path, "/")),
+		URI:      uri,
+	}
+	return repo, nil
 }
 
 func splitFullName(fullname string) ([]string, error) {
-	split := strings.Split(fullname, "/")
+	split := strings.SplitN(fullname, "/", 3)
 	if len(split) != 3 {
 		return nil, fmt.Errorf("%s is an invalid repository name", fullname)
 	}

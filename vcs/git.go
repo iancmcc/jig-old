@@ -15,6 +15,7 @@ type GitRepository struct {
 	owner string
 	name  string
 	path  string
+	url   string
 }
 
 func file_exists(filename string) bool {
@@ -25,11 +26,11 @@ func file_exists(filename string) bool {
 func getSSHFiles() (string, string, error) {
 	dsa_pub := os.ExpandEnv("$HOME/.ssh/id_dsa.pub")
 	dsa_key := os.ExpandEnv("$HOME/.ssh/id_dsa")
-	rsa_pub := os.ExpandEnv("$HOME/.ssh/id_rsa.pub")
-	rsa_key := os.ExpandEnv("$HOME/.ssh/id_rsa")
 	if file_exists(dsa_key) && file_exists(dsa_pub) {
 		return dsa_pub, dsa_key, nil
 	}
+	rsa_pub := os.ExpandEnv("$HOME/.ssh/id_rsa.pub")
+	rsa_key := os.ExpandEnv("$HOME/.ssh/id_rsa")
 	if file_exists(rsa_key) && file_exists(rsa_pub) {
 		return rsa_pub, rsa_key, nil
 	}

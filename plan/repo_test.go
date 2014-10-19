@@ -14,9 +14,7 @@ var _ = Describe("Repo", func() {
 	)
 
 	BeforeEach(func() {
-		repo = Repo{
-			FullName: "github.com/iancmcc/jig",
-		}
+		repo, _ = NewRepo("git@github.com:iancmcc/jig")
 	})
 
 	Describe("parsing the name", func() {
