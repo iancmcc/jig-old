@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cheggaaa/pb"
 	"github.com/libgit2/git2go"
 )
 
@@ -11,12 +12,15 @@ import (
 var _ SourceRepository = &GitRepository{}
 
 type GitRepository struct {
+	name string
 	path string
 	url  string
+	pb   *pb.ProgressBar
+	bank *ProgressBarBank
 }
 
-func NewGitRepository(path, url string) *GitRepository {
-	return &GitRepository{path, url}
+func NewGitRepository(name, path, url string, bank *ProgressBarBank) *GitRepository {
+	return &GitRepository{name, path, url, nil, bank}
 }
 
 func file_exists(filename string) bool {
@@ -28,20 +32,17 @@ func getSSHFiles() (string, string, error) {
 	dsa_pub := os.ExpandEnv("$HOME/.ssh/id_dsa.pub")
 	dsa_key := os.ExpandEnv("$HOME/.ssh/id_dsa")
 	if file_exists(dsa_key) && file_exists(dsa_pub) {
-		fmt.Printf("FILES YO")
 		return dsa_pub, dsa_key, nil
 	}
 	rsa_pub := os.ExpandEnv("$HOME/.ssh/id_rsa.pub")
 	rsa_key := os.ExpandEnv("$HOME/.ssh/id_rsa")
 	if file_exists(rsa_key) && file_exists(rsa_pub) {
-		fmt.Printf("RSA FILES YO")
 		return rsa_pub, rsa_key, nil
 	}
 	return "", "", fmt.Errorf("No SSH keys could be found")
 }
 
 func credentialsCallback(url string, username_from_url string, allowed_types git.CredType) (int, *git.Cred) {
-	fmt.Printf("url: %s, username_from_url: %s; allowed: %+v", url, username_from_url, allowed_types)
 	pub, key, err := getSSHFiles()
 	if err != nil {
 		return 0, nil
@@ -58,8 +59,11 @@ func certCheckCallback(cert *git.Certificate, valid bool, hostname string) int {
 	return 0
 }
 
-func progressCallback(stats git.TransferProgress) int {
-	fmt.Printf("%+v", stats)
+func (r *GitRepository) progressCallback(stats git.TransferProgress) int {
+	if r.pb == nil {
+		r.pb = r.bank.StartNew(int(stats.TotalObjects), r.name)
+	}
+	r.pb.Set(int(stats.ReceivedObjects))
 	return 0
 }
 
@@ -72,12 +76,9 @@ func (r *GitRepository) Create() error {
 		RemoteCallbacks: &git.RemoteCallbacks{
 			CertificateCheckCallback: certCheckCallback,
 			CredentialsCallback:      credentialsCallback,
-			TransferProgressCallback: progressCallback,
+			TransferProgressCallback: r.progressCallback,
 		},
 	}
 	_, err := git.Clone(r.url, r.path, opts)
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
-	return nil
+	return err
 }

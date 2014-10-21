@@ -21,20 +21,25 @@ func Initialize(ctx *cli.Context) {
 	bench.Initialize()
 
 	r, _ := plan.NewRepo("git@github.com:zenoss/platform-build")
-	fmt.Printf("%+v", r)
+	j, _ := plan.NewRepo("git@github.com:zenoss/manifest")
+	k, _ := plan.NewRepo("git@github.com:iancmcc/dotfiles")
+	m, _ := plan.NewRepo("git@github.com:control-center/serviced")
 	bench.AddRepository(&r)
+	bench.AddRepository(&j)
+	bench.AddRepository(&k)
+	bench.AddRepository(&m)
 
 	var wg sync.WaitGroup
+	bank := vcs.NewProgressBarBank()
 	for name, r := range bench.Plan().Repos {
 		if name != "" {
 			wg.Add(1)
 			go func(name string, r *plan.Repo) {
 				defer wg.Done()
-				fmt.Println("Starting clone of", name)
-				srcrepo, _ := vcs.NewSourceRepository(r, bench.SrcRoot())
-				fmt.Printf("SRCREPO: %+v", srcrepo)
-				srcrepo.Create()
-				fmt.Println("Done with", name)
+				srcrepo, _ := vcs.NewSourceRepository(r, bench.SrcRoot(), bank)
+				if err := srcrepo.Create(); err != nil {
+					fmt.Printf("%+v\n", err)
+				}
 			}(name, r)
 		}
 	}

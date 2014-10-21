@@ -2,7 +2,6 @@ package plan
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 )
 
@@ -30,7 +29,6 @@ func NewPlanFromJSON(reader io.Reader) (*Plan, error) {
 func cleanUpPlan(p *Plan) (*Plan, error) {
 	newplan := NewPlan()
 	for uri, repo := range p.Repos {
-		fmt.Printf("cleanUpPlan(): Cleaning up %s\n", uri)
 		newrepo, err := NewRepo(uri)
 		if err != nil {
 			return nil, err
