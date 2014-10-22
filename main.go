@@ -19,9 +19,16 @@ func Initialize(ctx *cli.Context) {
 	}
 	bench := workbench.NewWorkbench(pwd)
 	jigfile := ctx.Args().First()
-	if jigfile != "" {
+	_, err = os.Stat("Jigfile")
+	islocaljigfile := err == nil || !os.IsNotExist(err)
+	switch {
+	// If passed in, use it
+	case jigfile != "":
 		bench.InitializeFromFile(jigfile)
-	} else {
+		// If Jigfile in current directory, use it
+	case islocaljigfile:
+		bench.InitializeFromFile("Jigfile")
+	default:
 		bench.Initialize()
 	}
 
