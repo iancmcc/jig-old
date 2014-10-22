@@ -1,10 +1,14 @@
 package workbench
 
 import (
+	"fmt"
 	"os"
+	"path"
 	"path/filepath"
+	"sync"
 
 	"github.com/iancmcc/jig/plan"
+	"github.com/iancmcc/jig/vcs"
 )
 
 // Workbench represents an entire Jig environment. It is rooted somewhere on
@@ -15,9 +19,10 @@ type Workbench struct {
 }
 
 // NewWorkbench creates a Workbench rooted at the specified directory.
-func NewWorkbench(dirname string) *Workbench {
+func NewWorkbench(dirname string, plan *plan.Plan) *Workbench {
 	return &Workbench{
 		root: dirname,
+		plan: plan,
 	}
 }
 
@@ -41,31 +46,18 @@ func (b *Workbench) MetadataDir() string {
 	return filepath.Join(b.root, ".jig")
 }
 
-// Initialize realizes the workbench on the filesystem.
-func (b *Workbench) Initialize() error {
+// Realize realizes the workbench on the filesystem.
+func (b *Workbench) Realize() error {
 	if err := b.ensureDirectories(); err != nil {
 		return err
 	}
 	if err := b.initializePlan(); err != nil {
 		return err
 	}
+	if err := b.initializeRepos(); err != nil {
+		return err
+	}
 	return nil
-}
-
-func (b *Workbench) InitializeFromFile(filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	p, err := plan.NewPlanFromJSON(f)
-	if err != nil {
-		return err
-	}
-	b.plan = p
-	if err := b.ensureDirectories(); err != nil {
-		return err
-	}
-	return b.save()
 }
 
 // Plan returns the bench's current plan
@@ -91,31 +83,38 @@ func (b *Workbench) save() error {
 }
 
 func (b *Workbench) initializePlan() error {
-	var p *plan.Plan
 	filename := filepath.Join(b.MetadataDir(), "plan")
+	if b.plan == nil {
+		b.plan = plan.NewPlan()
+	}
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		// File doesn't exist yet; initialize with a new Plan
+		// File doesn't exist yet; initialize
 		f, err := os.Create(filename)
 		if err != nil {
 			return err
 		}
 		defer f.Close()
-		p = plan.NewPlan()
-		p.ToJSON(f)
-	} else {
-		f, err := os.Open(filename)
-		if err != nil {
-			return err
-		}
-		p, err = plan.NewPlanFromJSON(f)
-		if err != nil {
-			return err
+		b.plan.ToJSON(f)
+	}
+	return nil
+}
+
+func (b *Workbench) initializeRepos() error {
+	var wg sync.WaitGroup
+	bank := vcs.NewProgressBarBank()
+	for name, r := range b.Plan().Repos {
+		if name != "" {
+			wg.Add(1)
+			go func(name string, r *plan.Repo) {
+				defer wg.Done()
+				srcrepo, _ := vcs.NewSourceRepository(r, b.SrcRoot(), bank)
+				if err := srcrepo.Create(); err != nil {
+					fmt.Printf("%+v\n", err)
+				}
+			}(name, r)
 		}
 	}
-	if p.Repos == nil {
-		p.Repos = make(map[string]*plan.Repo)
-	}
-	b.plan = p
+	wg.Wait()
 	return nil
 }
 
@@ -128,6 +127,30 @@ func (b *Workbench) ensureDirectories() error {
 	}
 	if err := os.MkdirAll(b.BinDir(), 0755); err != nil {
 		return err
+	}
+	return nil
+}
+
+func FindNearestBench(dir string) *Workbench {
+	for {
+		metadir := path.Join(dir, ".jig")
+		fmt.Println("Looking for", metadir)
+		if _, err := os.Stat(metadir); os.IsNotExist(err) {
+			dir = filepath.Dir(dir)
+			fmt.Println("New dir", dir)
+			if dir == "." || dir == "/" {
+				break
+			}
+			continue
+		}
+		planfile := path.Join(metadir, "plan")
+		f, err := os.Open(planfile)
+		if err != nil {
+			break
+		}
+		defer f.Close()
+		p, err := plan.NewPlanFromJSON(f)
+		return NewWorkbench(dir, p)
 	}
 	return nil
 }

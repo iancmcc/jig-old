@@ -68,7 +68,6 @@ func (r *GitRepository) progressCallback(stats git.TransferProgress) int {
 }
 
 func (r *GitRepository) Create() error {
-	// TODO: Allow git to specify its protocol; use SSH only for now
 	opts := &git.CloneOptions{
 		CheckoutOpts: &git.CheckoutOpts{
 			Strategy: git.CheckoutSafeCreate,
