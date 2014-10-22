@@ -52,6 +52,22 @@ func (b *Workbench) Initialize() error {
 	return nil
 }
 
+func (b *Workbench) InitializeFromFile(filename string) error {
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	p, err := plan.NewPlanFromJSON(f)
+	if err != nil {
+		return err
+	}
+	b.plan = p
+	if err := b.ensureDirectories(); err != nil {
+		return err
+	}
+	return b.save()
+}
+
 // Plan returns the bench's current plan
 func (b *Workbench) Plan() *plan.Plan {
 	return b.plan

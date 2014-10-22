@@ -18,16 +18,12 @@ func Initialize(ctx *cli.Context) {
 		os.Exit(1)
 	}
 	bench := workbench.NewWorkbench(pwd)
-	bench.Initialize()
-
-	r, _ := plan.NewRepo("git@github.com:zenoss/platform-build")
-	j, _ := plan.NewRepo("git@github.com:zenoss/manifest")
-	k, _ := plan.NewRepo("git@github.com:iancmcc/dotfiles")
-	m, _ := plan.NewRepo("git@github.com:control-center/serviced")
-	bench.AddRepository(&r)
-	bench.AddRepository(&j)
-	bench.AddRepository(&k)
-	bench.AddRepository(&m)
+	jigfile := ctx.Args().First()
+	if jigfile != "" {
+		bench.InitializeFromFile(jigfile)
+	} else {
+		bench.Initialize()
+	}
 
 	var wg sync.WaitGroup
 	bank := vcs.NewProgressBarBank()
