@@ -57,6 +57,23 @@ func getPlan(ctx *cli.Context) (*plan.Plan, error) {
 }
 
 func Add(ctx *cli.Context) {
+	bench, err := getWorkbench(ctx)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, arg := range ctx.Args() {
+		repo, err := plan.NewRepo(arg)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		if err := bench.AddRepository(&repo); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
+	bench.Realize()
 }
 
 func Initialize(ctx *cli.Context) {
