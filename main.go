@@ -1,14 +1,31 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	/*
+		"fmt"
+		"os"
 
-	"github.com/codegangsta/cli"
-	"github.com/iancmcc/jig/plan"
-	"github.com/iancmcc/jig/workbench"
+		"github.com/iancmcc/jig/plan"
+		"github.com/iancmcc/jig/workbench"
+	*/
+	"github.com/jessevdk/go-flags"
 )
 
+type Options struct {
+	Verbose []bool `short:"v" long:"verbose" description:"Show verbose debug information"`
+}
+
+var (
+	parser  *flags.Parser
+	options *Options
+)
+
+func init() {
+	options = &Options{}
+	parser = flags.NewParser(options, flags.Default)
+}
+
+/*
 func getWorkbench(ctx *cli.Context) (*workbench.Workbench, error) {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -57,6 +74,7 @@ func getPlan(ctx *cli.Context) (*plan.Plan, error) {
 }
 
 func Add(ctx *cli.Context) {
+
 	bench, err := getWorkbench(ctx)
 	if err != nil {
 		fmt.Println(err)
@@ -84,21 +102,8 @@ func Initialize(ctx *cli.Context) {
 	}
 	bench.Realize()
 }
+*/
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "jig"
-	app.Usage = "Do something"
-	init := cli.Command{
-		Name:   "apply",
-		Usage:  "Apply changes to an existing workbench, or create a new one",
-		Action: Initialize,
-	}
-	add := cli.Command{
-		Name:   "add",
-		Usage:  "Add a repository",
-		Action: Add,
-	}
-	app.Commands = []cli.Command{init, add}
-	app.Run(os.Args)
+	parser.Parse()
 }
