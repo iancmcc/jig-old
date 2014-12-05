@@ -1,0 +1,36 @@
+{
+	"ImportPath": "github.com/iancmcc/jig",
+	"GoVersion": "go1.3.3",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/buger/goterm",
+			"Rev": "af3f07dadc88b80c7b5a15f26033c6dd979f012f"
+		},
+		{
+			"ImportPath": "github.com/cheggaaa/pb",
+			"Rev": "feab65fff1632fa12145d99b6ff8fbdc145a0302"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-33-gbfc92c2",
+			"Rev": "bfc92c213ef664d1061229997eac5cee319de775"
+		},
+		{
+			"ImportPath": "github.com/libgit2/git2go",
+			"Rev": "17963043741d7057cae1782032d022af0cd053fb"
+		},
+		{
+			"ImportPath": "github.com/onsi/ginkgo",
+			"Comment": "v1.1.0-28-g7d3d52b",
+			"Rev": "7d3d52b3a3a79d745c2a03ee81b5bc2086642201"
+		},
+		{
+			"ImportPath": "github.com/onsi/gomega",
+			"Comment": "v1.0-26-gdc751ce",
+			"Rev": "dc751ce5f266d83c26fae5c0a9093973b29cb61d"
+		}
+	]
+}

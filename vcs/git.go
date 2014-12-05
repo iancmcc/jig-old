@@ -42,16 +42,16 @@ func getSSHFiles() (string, string, error) {
 	return "", "", fmt.Errorf("No SSH keys could be found")
 }
 
-func credentialsCallback(url string, username_from_url string, allowed_types git.CredType) (int, *git.Cred) {
+func credentialsCallback(url string, username_from_url string, allowed_types git.CredType) (git.ErrorCode, *git.Cred) {
 	pub, key, err := getSSHFiles()
 	if err != nil {
 		return 0, nil
 	}
 	i, cred := git.NewCredSshKey("git", pub, key, "")
-	return i, &cred
+	return git.ErrorCode(i), &cred
 }
 
-func certCheckCallback(cert *git.Certificate, valid bool, hostname string) int {
+func certCheckCallback(cert *git.Certificate, valid bool, hostname string) git.ErrorCode {
 	// Don't bother checking any certs, just go with it if valid
 	if valid {
 		return 1
@@ -59,7 +59,7 @@ func certCheckCallback(cert *git.Certificate, valid bool, hostname string) int {
 	return 0
 }
 
-func (r *GitRepository) progressCallback(stats git.TransferProgress) int {
+func (r *GitRepository) progressCallback(stats git.TransferProgress) git.ErrorCode {
 	if r.pb == nil {
 		r.pb = r.bank.StartNew(int(stats.TotalObjects), r.name)
 	}
