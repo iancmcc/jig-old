@@ -1,109 +1,12 @@
 package main
 
 import (
-	/*
-		"fmt"
-		"os"
+	"os"
 
-		"github.com/iancmcc/jig/plan"
-		"github.com/iancmcc/jig/workbench"
-	*/
-	"github.com/jessevdk/go-flags"
+	"github.com/iancmcc/jig/commands"
 )
-
-type Options struct {
-	Verbose []bool `short:"v" long:"verbose" description:"Show verbose debug information"`
-}
-
-var (
-	parser  *flags.Parser
-	options *Options
-)
-
-func init() {
-	options = &Options{}
-	parser = flags.NewParser(options, flags.Default)
-}
-
-/*
-func getWorkbench(ctx *cli.Context) (*workbench.Workbench, error) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("Finding nearest bench")
-	if bench := workbench.FindNearestBench(pwd); bench != nil {
-		return bench, nil
-	}
-	// We're not in an existing bench, so let's get a plan and create a bench
-	// from it
-	fmt.Println("No existing bench")
-	plan, err := getPlan(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return workbench.NewWorkbench(pwd, plan), nil
-}
-
-// plan() discovers the current bench plan in the following order:
-//   1. Plan specified by first argument
-//   3. Plan from Jigfile in cwd
-//   4. Empty plan
-// First one wins.
-func getPlan(ctx *cli.Context) (*plan.Plan, error) {
-	// Plan specified by first argument
-	fmt.Println("Getting plan")
-	filename := ctx.Args().First()
-	if filename == "" {
-		// Jigfile in current dir
-		filename = "Jigfile"
-	}
-	fmt.Printf("Trying plan filename %s\n", filename)
-	if _, err := os.Stat(filename); !os.IsNotExist(err) {
-		f, err := os.Open(filename)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		fmt.Printf("New plan from json")
-		return plan.NewPlanFromJSON(f)
-	}
-	// Empty plan
-	fmt.Printf("Empty plan")
-	return plan.NewPlan(), nil
-}
-
-func Add(ctx *cli.Context) {
-
-	bench, err := getWorkbench(ctx)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	for _, arg := range ctx.Args() {
-		repo, err := plan.NewRepo(arg)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		if err := bench.AddRepository(&repo); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
-	bench.Realize()
-}
-
-func Initialize(ctx *cli.Context) {
-	bench, err := getWorkbench(ctx)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	bench.Realize()
-}
-*/
 
 func main() {
-	parser.Parse()
+	err := commands.Execute()
+	os.Exit(err.ExitCode)
 }
