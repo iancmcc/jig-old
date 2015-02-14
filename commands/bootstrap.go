@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/jessevdk/go-flags"
 )
 
 var completion string = `
@@ -27,12 +29,23 @@ _jig_completion() {
 complete -F _jig_completion jig
 `
 
+var _ flags.Commander = &Bootstrap{}
+
 func init() {
 	parser.AddCommand("bootstrap", "Bootstrap a shell environment", "Bootstrap a shell environment", &Bootstrap{})
 }
 
 type Bootstrap struct {
 	Alias string `short:"a" long:"alias" description:"Specify the alias used for changing to source directories" default:"cdj" env:"JIG_CD_ALIAS"`
+}
+
+func (b *Bootstrap) Execute(args []string) error {
+	path, err := b.writeToFile()
+	if err != nil {
+		return err
+	}
+	fmt.Println(path)
+	return nil
 }
 
 func (b *Bootstrap) writeToFile() (string, error) {
@@ -49,13 +62,4 @@ func (b *Bootstrap) writeToFile() (string, error) {
 		return "", err
 	}
 	return bootfile, nil
-}
-
-func (b *Bootstrap) Execute(args []string) error {
-	path, err := b.writeToFile()
-	if err != nil {
-		return err
-	}
-	fmt.Println(path)
-	return nil
 }

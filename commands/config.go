@@ -8,7 +8,7 @@ import (
 
 type JigOptions struct {
 	Verbose      []bool `short:"v" long:"verbose" description:"Show verbose debug information"`
-	JigConfigDir string `short:"c" long:"config" description:"Jig configuration directory" env:"JIG_CONFIG_DIR" default:"$HOME/.jigconfig"`
+	JigConfigDir string `short:"c" long:"config" description:"Jig configuration directory" env:"JIG_CONFIG_DIR" default-mask:"$HOME/.jigconfig"`
 	IsTTY        bool
 }
 
@@ -17,7 +17,7 @@ type JigOptions struct {
 * of ~/.jigconfig.
  */
 func (o *JigOptions) ConfigDir() (string, error) {
-	if o.JigConfigDir == "$HOME/.jigconfig" {
+	if o.JigConfigDir == "" {
 		usr, err := user.Current()
 		if err != nil {
 			return "", err

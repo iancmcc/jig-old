@@ -11,13 +11,10 @@ var (
 	options JigOptions
 )
 
-func init() {
+func Execute() ExecError {
 	if _, err := parser.AddGroup("Jig Options", "Jig options", &options); err != nil {
 		os.Exit(1)
 	}
-	parser.Parse()
-}
-
-func Execute() ExecError {
-	return newExecError(nil)
+	_, err := parser.Parse()
+	return newExecError(err)
 }
