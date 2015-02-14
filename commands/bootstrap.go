@@ -3,8 +3,6 @@ package commands
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
-	"os/user"
 	"path/filepath"
 )
 
@@ -34,20 +32,17 @@ func init() {
 }
 
 type Bootstrap struct {
-	Alias string `short:"a" long:"alias" description:"Specify the alias used for changing to source directories" default:"cdj"`
+	Alias string `short:"a" long:"alias" description:"Specify the alias used for changing to source directories" default:"cdj" env:"JIG_CD_ALIAS"`
 }
 
 func (b *Bootstrap) writeToFile() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	jigDir := filepath.Join(usr.HomeDir, ".jig")
-	// Ensure the directory is created
-	os.MkdirAll(jigDir, 0755)
 
 	completed := fmt.Sprintf(completion, b.Alias)
 
+	jigDir, err := options.EnsureConfigDir()
+	if err != nil {
+		return "", err
+	}
 	// Write to a file
 	bootfile := filepath.Join(jigDir, "bootstrap~")
 	if err := ioutil.WriteFile(bootfile, []byte(completed), 0644); err != nil {
