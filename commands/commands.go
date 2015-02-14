@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-	if _, err := parser.AddGroup("jig Options", "Global jig Options", &options); err != nil {
+	if _, err := parser.AddGroup("Jig Options", "Jig options", &options); err != nil {
 		os.Exit(1)
 	}
 	parser.Parse()
