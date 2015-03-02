@@ -9,6 +9,10 @@
 			"ImportPath": "github.com/jessevdk/go-flags",
 			"Comment": "v1-291-g15347ef",
 			"Rev": "15347ef417a300349807983f15af9e65cd2e1b3a"
+		},
+		{
+			"ImportPath": "gopkg.in/check.v1",
+			"Rev": "64131543e7896d5bcc6bd5a76287eb75ea96c673"
 		}
 	]
 }
