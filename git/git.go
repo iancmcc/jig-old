@@ -3,10 +3,7 @@ package git
 import (
 	"io"
 	"os/exec"
-	"regexp"
 )
-
-var progre = regexp.MustCompile(`(?P<Message>.*?):.*\((?P<Current>\d+)/(?P<Total>\d+)\)`)
 
 type Git struct {
 }
