@@ -30,22 +30,6 @@ type GitURI struct {
 	scheme jig.URIScheme
 }
 
-func (u *GitURI) Domain() string {
-	return u.domain
-}
-
-func (u *GitURI) Owner() string {
-	return u.owner
-}
-
-func (u *GitURI) Repository() string {
-	return u.repo
-}
-
-func (u *GitURI) Scheme() jig.URIScheme {
-	return u.scheme
-}
-
 func ParseGitURI(uri string) (jig.RepositoryURI, error) {
 	var (
 		domain  string
@@ -81,4 +65,32 @@ func ParseGitURI(uri string) (jig.RepositoryURI, error) {
 		owner:  owner,
 		repo:   repo,
 	}, nil
+}
+
+func (u *GitURI) Domain() string {
+	return u.domain
+}
+
+func (u *GitURI) Owner() string {
+	return u.owner
+}
+
+func (u *GitURI) Repository() string {
+	return u.repo
+}
+
+func (u *GitURI) Scheme() jig.URIScheme {
+	return u.scheme
+}
+
+func (u *GitURI) ToSSH() string {
+	return fmt.Sprintf("git@%s:%s/%s", u.domain, u.owner, u.repo)
+}
+
+func (u *GitURI) ToHTTPS() string {
+	return fmt.Sprintf("https://%s/%s/%s", u.domain, u.owner, u.repo)
+}
+
+func (u *GitURI) ToGit() string {
+	return fmt.Sprintf("git://%s/%s/%s", u.domain, u.owner, u.repo)
 }
