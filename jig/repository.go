@@ -15,6 +15,7 @@ type RepositoryURI interface {
 	Domain() string
 	Owner() string
 	Repository() string
+	Path() string
 }
 
 type URIScheme string

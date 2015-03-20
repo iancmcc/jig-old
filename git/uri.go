@@ -94,3 +94,7 @@ func (u *GitURI) ToHTTPS() string {
 func (u *GitURI) ToGit() string {
 	return fmt.Sprintf("git://%s/%s/%s", u.domain, u.owner, u.repo)
 }
+
+func (u *GitURI) Path() string {
+	return fmt.Sprintf("%s/%s/%s", u.domain, u.owner, u.repo)
+}

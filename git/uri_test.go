@@ -26,6 +26,9 @@ func (s *UriSuite) TestParseSSHUri(c *C) {
 	c.Assert(err, IsNil)
 	assertURIParts(uri, c)
 	c.Assert(string(uri.Scheme()), Equals, jig.SCHEME_SSH)
+	gituri := uri.(*GitURI)
+	c.Assert(gituri.ToSSH(), Equals, "git@github.com:iancmcc/jig")
+	c.Assert(gituri.ToHTTPS(), Equals, "https://github.com/iancmcc/jig")
 }
 
 func (s *UriSuite) TestParseHTTPSUri(c *C) {
