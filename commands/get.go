@@ -16,6 +16,7 @@ func init() {
 }
 
 type Get struct {
+	jigroot_args
 	Args struct {
 		Repositories []string `positional-arg-name:"REPOSITORY" required:"yes"`
 	} `positional-args:"yes" required:"yes"`
@@ -23,6 +24,7 @@ type Get struct {
 
 func (g *Get) getRepo(uri jig.RepositoryURI) {
 	fmt.Println(uri.Path())
+	fmt.Println(g.ResolveJig())
 }
 
 func (g *Get) Execute(args []string) error {
