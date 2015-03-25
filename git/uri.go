@@ -12,7 +12,7 @@ var (
 		jig.SCHEME_HTTPS: regexp.MustCompile(`https://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
 		jig.SCHEME_SSH:   regexp.MustCompile(`git@(?P<domain>.+):(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
 		jig.SCHEME_GIT:   regexp.MustCompile(`git://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
-		jig.SCHEME_EMPTY: regexp.MustCompile(`(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
+		jig.SCHEME_EMPTY: regexp.MustCompile(`((?P<domain>.+)/)?(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
 	}
 	scheme_order []jig.URIScheme = []jig.URIScheme{jig.SCHEME_SSH, jig.SCHEME_HTTPS, jig.SCHEME_GIT, jig.SCHEME_EMPTY}
 )
@@ -47,12 +47,15 @@ func ParseGitURI(uri string) (jig.RepositoryURI, error) {
 				result[name] = match[i]
 			}
 			domain = result["domain"]
+			if domain == "" {
+				domain = "github.com"
+			}
 			owner = result["owner"]
 			repo = result["repo"]
 			break
 		}
 	}
-	if domain == "" {
+	if repo == "" {
 		// No match
 		return nil, fmt.Errorf("Unable to parse git URI: %s", uri)
 	}

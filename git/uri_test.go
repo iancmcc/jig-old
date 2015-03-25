@@ -31,6 +31,17 @@ func (s *UriSuite) TestParseSSHUri(c *C) {
 	c.Assert(gituri.ToHTTPS(), Equals, "https://github.com/iancmcc/jig")
 }
 
+func (s *UriSuite) TestParseNoRepoUri(c *C) {
+	var (
+		uri jig.RepositoryURI
+		err error
+	)
+	uri, err = ParseGitURI("iancmcc/jig")
+	c.Assert(err, IsNil)
+	assertURIParts(uri, c)
+	c.Assert(uri.Scheme(), Equals, jig.SCHEME_HTTPS)
+}
+
 func (s *UriSuite) TestParseHTTPSUri(c *C) {
 	var (
 		uri jig.RepositoryURI
