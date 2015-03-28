@@ -33,6 +33,7 @@ func (g *Get) getRepo(uri jig.RepositoryURI) error {
 }
 
 func (g *Get) Execute(args []string) error {
+	g.InitializeLogging()
 	if len(g.Args.Repositories) < 1 {
 		return &flags.Error{flags.ErrRequired, "Error: At least one repository must be specified"}
 	}

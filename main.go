@@ -7,8 +7,11 @@ import (
 	"github.com/iancmcc/jig/commands"
 )
 
+func init() {
+	log.SetLevel(log.ErrorLevel)
+}
+
 func main() {
-	log.SetLevel(log.DebugLevel)
 	log.Info("Welcome to Jig")
 	err := commands.Execute()
 	log.WithFields(log.Fields{
