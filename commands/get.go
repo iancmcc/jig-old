@@ -1,8 +1,9 @@
 package commands
 
 import (
-	"fmt"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/iancmcc/jig/git"
 	"github.com/iancmcc/jig/jig"
@@ -22,15 +23,20 @@ type Get struct {
 	} `positional-args:"yes" required:"yes"`
 }
 
-func (g *Get) getRepo(uri jig.RepositoryURI) {
-	fmt.Println(uri.Path())
-	fmt.Println(g.ResolveJig())
+func (g *Get) getRepo(uri jig.RepositoryURI) error {
+	j, err := g.ResolveJig()
+	if err != nil {
+		return err
+	}
+	repo := git.GitRepository{jig.BaseRepository{URI: uri}}
+	return j.Reconcile(&repo)
 }
 
 func (g *Get) Execute(args []string) error {
 	if len(g.Args.Repositories) < 1 {
 		return &flags.Error{flags.ErrRequired, "Error: At least one repository must be specified"}
 	}
+	log.Debug("Running get command")
 	var wg sync.WaitGroup
 	for _, repo := range g.Args.Repositories {
 		uri, err := git.ParseGitURI(repo)
@@ -40,6 +46,9 @@ func (g *Get) Execute(args []string) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			log.WithFields(log.Fields{
+				"repository": uri,
+			}).Info("Getting repository")
 			g.getRepo(uri)
 		}()
 	}

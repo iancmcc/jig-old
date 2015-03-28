@@ -101,3 +101,16 @@ func (u *GitURI) ToGit() string {
 func (u *GitURI) Path() string {
 	return fmt.Sprintf("%s/%s/%s", u.domain, u.owner, u.repo)
 }
+
+func (u *GitURI) String() string {
+	switch u.scheme {
+	case jig.SCHEME_HTTPS:
+		return u.ToHTTPS()
+	case jig.SCHEME_SSH:
+		return u.ToSSH()
+	case jig.SCHEME_GIT:
+		return u.ToGit()
+	default:
+		return u.ToHTTPS()
+	}
+}

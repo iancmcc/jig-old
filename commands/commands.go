@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/iancmcc/jig/jig"
 	"github.com/jessevdk/go-flags"
 )
@@ -22,6 +24,9 @@ type jigroot_args struct {
 func (j *jigroot_args) ResolveJig() (*jig.Jig, error) {
 	if j.Jigroot == "" {
 		if jj, err := jig.FindClosestJig(j.Jigroot); err == nil {
+			log.WithFields(log.Fields{
+				"path": jj.Path(),
+			}).Info("Found jig root")
 			return jj, err
 		}
 	}
