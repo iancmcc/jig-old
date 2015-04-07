@@ -2,6 +2,7 @@ package commands
 
 import (
 	"sync"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -24,16 +25,14 @@ type Get struct {
 }
 
 func (g *Get) getRepo(uri jig.RepositoryURI) error {
-	j, err := g.ResolveJig()
-	if err != nil {
-		return err
-	}
 	repo := git.GitRepository{jig.BaseRepository{URI: uri}}
-	return j.Reconcile(&repo)
+	return curJig.Reconcile(&repo)
 }
 
 func (g *Get) Execute(args []string) error {
-	g.InitializeLogging()
+	if err := g.Initialize(); err != nil {
+		return err
+	}
 	if len(g.Args.Repositories) < 1 {
 		return &flags.Error{flags.ErrRequired, "Error: At least one repository must be specified"}
 	}
@@ -47,10 +46,12 @@ func (g *Get) Execute(args []string) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			t := time.Now()
+			g.getRepo(uri)
 			log.WithFields(log.Fields{
 				"repository": uri,
-			}).Info("Getting repository")
-			g.getRepo(uri)
+				"time":       time.Since(t).Seconds(),
+			}).Debug("Getting repository")
 		}()
 	}
 	wg.Wait()

@@ -16,10 +16,12 @@ var (
 	options JigOptions
 )
 
+var curJig *jig.Jig
+
 type jigroot_args struct {
 	Jigroot string `short:"j" long:"jigroot" description:"Path to Jigroot"`
 	Init    bool   `long:"init" description:"Initialize a Jigroot"`
-	Verbose []bool `short:"v" long:"verbose" description:"Set logging verbosity"`
+	Verbose bool   `short:"v" long:"verbose" description:"Display verbose logging"`
 }
 
 func (j *jigroot_args) ResolveJig() (*jig.Jig, error) {
@@ -43,15 +45,15 @@ func (j *jigroot_args) ResolveJig() (*jig.Jig, error) {
 	return jj, nil
 }
 
-func (j *jigroot_args) InitializeLogging() {
-	switch len(j.Verbose) {
-	case 1:
-		log.SetLevel(log.WarnLevel)
-	case 2:
-		log.SetLevel(log.InfoLevel)
-	case 3:
+func (j *jigroot_args) Initialize() error {
+	var err error
+	if j.Verbose {
 		log.SetLevel(log.DebugLevel)
 	}
+	if curJig, err = j.ResolveJig(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func Execute() ExecError {
