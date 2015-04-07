@@ -8,11 +8,11 @@ import (
 )
 
 func init() {
+	log.SetOutput(os.Stderr)
 	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
-	log.Info("Welcome to Jig")
 	err := commands.Execute()
 	log.WithFields(log.Fields{
 		"exitcode": err.ExitCode,
