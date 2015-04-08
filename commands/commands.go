@@ -19,7 +19,7 @@ var (
 var curJig *jig.Jig
 
 type jigroot_args struct {
-	Jigroot string `short:"j" long:"jigroot" description:"Path to Jigroot"`
+	Jigroot string `short:"j" long:"jigroot" description:"Path to Jigroot" env:"JIGROOT"`
 	Init    bool   `long:"init" description:"Initialize a Jigroot"`
 	Verbose bool   `short:"v" long:"verbose" description:"Display verbose logging"`
 }
