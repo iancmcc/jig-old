@@ -13,11 +13,12 @@ type Jigroot interface {
 }
 
 type Jig struct {
-	path string
+	path  string
+	repos []*Repository
 }
 
 func NewJig(path string) (*Jig, error) {
-	return &Jig{path}, nil
+	return &Jig{path: path, repos: []*Repository{}}, nil
 }
 
 func FindClosestJig(path string) (j *Jig, err error) {
@@ -72,5 +73,10 @@ func (j *Jig) Reconcile(r Repository) error {
 	if err := r.Clone(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (j *Jig) ReconcileAll() error {
+	//r.SetRoot(j.Path())
 	return nil
 }
