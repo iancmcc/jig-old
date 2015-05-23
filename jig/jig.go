@@ -80,3 +80,20 @@ func (j *Jig) ReconcileAll() error {
 	//r.SetRoot(j.Path())
 	return nil
 }
+
+func (j *Jig) ListRepositories() []string {
+	// TODO: Replace this with a cache with checksum verification
+	repos := []string{}
+	repoChecker := func(path string, info os.FileInfo, err error) error {
+		// Check for a directory named .git
+		_, e := os.Stat(filepath.Join(path, ".git"))
+		if e == nil {
+			// If found, append to repos and return SkipDir
+			repos = append(repos, path)
+			return filepath.SkipDir
+		}
+		return nil
+	}
+	filepath.Walk(j.Path(), repoChecker)
+	return repos
+}
