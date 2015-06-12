@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/jessevdk/go-flags"
 )
 
@@ -48,6 +50,14 @@ func (d *Dir) Execute(args []string) error {
 		fmt.Println(d.Jigroot)
 		return nil
 	}
+	repos, err := d.getSimilarRepositories(string(d.Args.Term))
+	if err != nil {
+		return nil
+	}
+	for _, s := range repos {
+		fmt.Println(s)
+		return nil
+	}
 	return nil
 }
 
@@ -59,7 +69,9 @@ func (d *Dir) getSimilarRepositories(term string) ([]string, error) {
 	repos := j.ListRepositories()
 	result := []string{}
 	for _, s := range repos {
-		w := []rune(strings.TrimPrefix(s, d.Jigroot+"/"))
+		trimmed := strings.TrimPrefix(s, d.Jigroot+"/")
+		log.Debug("Checking against %s", trimmed)
+		w := []rune(trimmed)
 		x, _ := FuzzyMatch(false, &w, []rune(term))
 		if x > 0 {
 			result = append(result, s)
