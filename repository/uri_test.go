@@ -1,4 +1,4 @@
-package git_test
+package repository_test
 
 import (
 	. "github.com/iancmcc/jig/git"

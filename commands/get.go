@@ -6,8 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/iancmcc/jig/git"
-	"github.com/iancmcc/jig/jig"
+	"github.com/iancmcc/jig/repository"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -24,8 +23,8 @@ type Get struct {
 	} `positional-args:"yes" required:"yes"`
 }
 
-func (g *Get) getRepo(uri jig.RepositoryURI) error {
-	repo := git.GitRepository{jig.BaseRepository{URI: uri}}
+func (g *Get) getRepo(uri repository.RepositoryURI) error {
+	repo := repository.GitRepository{repository.BaseRepository{URI: uri}}
 	return curJig.Reconcile(&repo)
 }
 
@@ -39,7 +38,7 @@ func (g *Get) Execute(args []string) error {
 	log.Debug("Running get command")
 	var wg sync.WaitGroup
 	for _, repo := range g.Args.Repositories {
-		uri, err := git.ParseGitURI(repo)
+		uri, err := repository.ParseGitURI(repo)
 		if err != nil {
 			return err
 		}

@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/iancmcc/jig/repository"
 )
 
 type Jigroot interface {
@@ -14,11 +16,11 @@ type Jigroot interface {
 
 type Jig struct {
 	path  string
-	repos []*Repository
+	repos []*repository.Repository
 }
 
 func NewJig(path string) (*Jig, error) {
-	return &Jig{path: path, repos: []*Repository{}}, nil
+	return &Jig{path: path, repos: []*repository.Repository{}}, nil
 }
 
 func FindClosestJig(path string) (j *Jig, err error) {
@@ -65,7 +67,7 @@ func (j *Jig) IsRoot() bool {
 /*
 * Reconcile() manifests a repository state within a Jig.
  */
-func (j *Jig) Reconcile(r Repository) error {
+func (j *Jig) Reconcile(r repository.Repository) error {
 	r.SetRoot(j.Path())
 	if err := r.EnsurePath(); err != nil {
 		return err
@@ -81,19 +83,37 @@ func (j *Jig) ReconcileAll() error {
 	return nil
 }
 
-func (j *Jig) ListRepositories() []string {
+func (j *Jig) ListRepositories() []repository.Repository {
 	// TODO: Replace this with a cache with checksum verification
-	repos := []string{}
+	repos := []repository.Repository{}
 	repoChecker := func(path string, info os.FileInfo, err error) error {
 		// Check for a directory named .git
 		_, e := os.Stat(filepath.Join(path, ".git"))
 		if e == nil {
 			// If found, append to repos and return SkipDir
-			repos = append(repos, path)
+			repo, err := repository.GitRepositoryFromPath(path)
+			if err != nil {
+				return err
+			}
+			repos = append(repos, &repo)
 			return filepath.SkipDir
 		}
 		return nil
 	}
 	filepath.Walk(j.Path(), repoChecker)
 	return repos
+}
+
+func (j *Jig) FindRepositories(term string) []repository.Repository {
+	repos := j.ListRepositories()
+	result := []repository.Repository{}
+	for _, s := range repos {
+		trimmed := strings.TrimPrefix(s.GetRoot(), j.path+"/")
+		w := []rune(trimmed)
+		x, _ := FuzzyMatch(false, &w, []rune(term))
+		if x > 0 {
+			result = append(result, s)
+		}
+	}
+	return result
 }

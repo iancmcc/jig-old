@@ -1,10 +1,8 @@
-package git
+package repository
 
 import (
 	"io"
 	"os/exec"
-
-	"github.com/iancmcc/jig/jig"
 )
 
 var git Git
@@ -32,10 +30,10 @@ func (g *Git) Clone(uri, target string) (<-chan *Progress, error) {
 }
 
 // Validate that GitRepository satisfies the Repository interface
-var _ jig.Repository = &GitRepository{}
+var _ Repository = &GitRepository{}
 
 type GitRepository struct {
-	jig.BaseRepository
+	BaseRepository
 }
 
 func (r *GitRepository) Clone() error {
@@ -51,4 +49,10 @@ func (r *GitRepository) Clone() error {
 	for _ = range c {
 	}
 	return nil
+}
+
+func GitRepositoryFromPath(path string) (GitRepository, error) {
+	repo := GitRepository{BaseRepository{root: path}}
+	return repo, nil
+
 }

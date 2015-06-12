@@ -1,41 +1,41 @@
-package git
+package repository
 
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/iancmcc/jig/jig"
 )
 
 var (
-	patterns map[jig.URIScheme]*regexp.Regexp = map[jig.URIScheme]*regexp.Regexp{
-		jig.SCHEME_HTTPS: regexp.MustCompile(`https://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
-		jig.SCHEME_SSH:   regexp.MustCompile(`git@(?P<domain>.+):(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
-		jig.SCHEME_GIT:   regexp.MustCompile(`git://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
-		jig.SCHEME_EMPTY: regexp.MustCompile(`((?P<domain>.+)/)?(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
+	patterns map[URIScheme]*regexp.Regexp = map[URIScheme]*regexp.Regexp{
+		SCHEME_HTTPS: regexp.MustCompile(`https://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
+		SCHEME_SSH:   regexp.MustCompile(`git@(?P<domain>.+):(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
+		SCHEME_GIT:   regexp.MustCompile(`git://(?P<domain>.+)/(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
+		SCHEME_EMPTY: regexp.MustCompile(`((?P<domain>.+)/)?(?P<owner>.+)/(?P<repo>.+)(\.git)?`),
 	}
-	scheme_order []jig.URIScheme = []jig.URIScheme{jig.SCHEME_SSH, jig.SCHEME_HTTPS, jig.SCHEME_GIT, jig.SCHEME_EMPTY}
+	scheme_order []URIScheme = []URIScheme{SCHEME_SSH, SCHEME_HTTPS, SCHEME_GIT, SCHEME_EMPTY}
 )
+
+type URIParser func(uri string) (RepositoryURI, error)
 
 // Type checking
 var (
-	_ jig.URIParser     = ParseGitURI
-	_ jig.RepositoryURI = &GitURI{}
+	_ URIParser     = ParseGitURI
+	_ RepositoryURI = &GitURI{}
 )
 
 type GitURI struct {
 	domain string
 	owner  string
 	repo   string
-	scheme jig.URIScheme
+	scheme URIScheme
 }
 
-func ParseGitURI(uri string) (jig.RepositoryURI, error) {
+func ParseGitURI(uri string) (RepositoryURI, error) {
 	var (
 		domain  string
 		owner   string
 		repo    string
-		scheme  jig.URIScheme
+		scheme  URIScheme
 		pattern *regexp.Regexp
 	)
 	for _, scheme = range scheme_order {
@@ -59,8 +59,8 @@ func ParseGitURI(uri string) (jig.RepositoryURI, error) {
 		// No match
 		return nil, fmt.Errorf("Unable to parse git URI: %s", uri)
 	}
-	if scheme == jig.SCHEME_EMPTY {
-		scheme = jig.SCHEME_HTTPS
+	if scheme == SCHEME_EMPTY {
+		scheme = SCHEME_HTTPS
 	}
 	return &GitURI{
 		domain: domain,
@@ -82,7 +82,7 @@ func (u *GitURI) Repository() string {
 	return u.repo
 }
 
-func (u *GitURI) Scheme() jig.URIScheme {
+func (u *GitURI) Scheme() URIScheme {
 	return u.scheme
 }
 
@@ -104,11 +104,11 @@ func (u *GitURI) Path() string {
 
 func (u *GitURI) String() string {
 	switch u.scheme {
-	case jig.SCHEME_HTTPS:
+	case SCHEME_HTTPS:
 		return u.ToHTTPS()
-	case jig.SCHEME_SSH:
+	case SCHEME_SSH:
 		return u.ToSSH()
-	case jig.SCHEME_GIT:
+	case SCHEME_GIT:
 		return u.ToGit()
 	default:
 		return u.ToHTTPS()

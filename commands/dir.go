@@ -2,9 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
-
-	log "github.com/Sirupsen/logrus"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -66,16 +63,10 @@ func (d *Dir) getSimilarRepositories(term string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	repos := j.ListRepositories()
+	repos := j.FindRepositories(term)
 	result := []string{}
 	for _, s := range repos {
-		trimmed := strings.TrimPrefix(s, d.Jigroot+"/")
-		log.Debug("Checking against %s", trimmed)
-		w := []rune(trimmed)
-		x, _ := FuzzyMatch(false, &w, []rune(term))
-		if x > 0 {
-			result = append(result, s)
-		}
+		result = append(result, s.GetRoot())
 	}
 	return result, err
 }
