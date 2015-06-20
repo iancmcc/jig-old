@@ -15,6 +15,24 @@ var (
 	scheme_order []URIScheme = []URIScheme{SCHEME_SSH, SCHEME_HTTPS, SCHEME_GIT, SCHEME_EMPTY}
 )
 
+type URIScheme string
+
+const (
+	SCHEME_HTTPS URIScheme = "https"
+	SCHEME_SSH             = "ssh"
+	SCHEME_GIT             = "git"
+	SCHEME_EMPTY           = ""
+)
+
+type RepositoryURI interface {
+	Scheme() URIScheme
+	Domain() string
+	Owner() string
+	Repository() string
+	Path() string
+	String() string
+}
+
 type URIParser func(uri string) (RepositoryURI, error)
 
 // Type checking

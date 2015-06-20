@@ -6,24 +6,6 @@ import (
 	"path/filepath"
 )
 
-type URIScheme string
-
-const (
-	SCHEME_HTTPS URIScheme = "https"
-	SCHEME_SSH             = "ssh"
-	SCHEME_GIT             = "git"
-	SCHEME_EMPTY           = ""
-)
-
-type RepositoryURI interface {
-	Scheme() URIScheme
-	Domain() string
-	Owner() string
-	Repository() string
-	Path() string
-	String() string
-}
-
 type Repository interface {
 	// GetURI() returns the URI describing this repository
 	GetURI() *RepositoryURI

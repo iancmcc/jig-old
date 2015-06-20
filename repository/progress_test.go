@@ -4,7 +4,7 @@ import (
 	"bytes"
 
 	"github.com/iancmcc/jig/fixtures"
-	. "github.com/iancmcc/jig/git"
+	. "github.com/iancmcc/jig/repository"
 	. "gopkg.in/check.v1"
 )
 
