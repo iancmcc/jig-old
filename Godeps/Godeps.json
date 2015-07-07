@@ -18,10 +18,6 @@
 		{
 			"ImportPath": "gopkg.in/check.v1",
 			"Rev": "64131543e7896d5bcc6bd5a76287eb75ea96c673"
-		},
-		{
-			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "49c95bdc21843256fb6c4e0d370a05f24a0bf213"
 		}
 	]
 }
