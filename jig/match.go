@@ -3,6 +3,7 @@ package jig
 import (
 	"container/heap"
 	"math"
+	"sort"
 	"strings"
 
 	"github.com/antzucaro/matchr"
@@ -47,14 +48,21 @@ func (h MatchHeap) ToStringArray() []string {
 }
 
 func BestScore(term, candidate string) float64 {
-	if strings.Contains(term, "/") {
+	n := strings.Count(term, "/")
+	if n > 0 {
+		split := strings.SplitN(candidate, "/", 3-n)
+		candidate = split[len(split)-1]
 		// Just return the score comparing the two
-		return matchr.Jaro(term, candidate)
+		return matchr.JaroWinkler(term, candidate, true)
 	}
 	i := 0.0
 	segments := strings.Split(candidate, "/")
-	for x, s := range segments {
-		i = math.Max(matchr.Jaro(term, s)+float64(x), i)
+	sort.Reverse(sort.StringSlice(segments))
+	for _, s := range segments {
+		i = math.Max(matchr.JaroWinkler(term, s, true), i)
+		if i == 1 {
+			break
+		}
 	}
 	return i
 }
@@ -66,7 +74,6 @@ func SortedMatches(term string, candidates []string) []string {
 		heap.Push(matches, &Match{
 			match: s,
 			score: BestScore(term, s),
-			//score: matchr.DamerauLevenshtein(term, rejoined),
 		})
 	}
 	return matches.ToStringArray()
