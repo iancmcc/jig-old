@@ -104,16 +104,25 @@ func (j *Jig) ListRepositories() []repository.Repository {
 	return repos
 }
 
+func (j *Jig) repositoryMap() map[string]repository.Repository {
+	result := make(map[string]repository.Repository)
+	for _, repo := range j.ListRepositories() {
+		// Get the path relative to the root
+		trimmed := strings.TrimPrefix(repo.GetRoot(), j.path+"/")
+		result[trimmed] = repo
+	}
+	return result
+}
+
 func (j *Jig) FindRepositories(term string) []repository.Repository {
-	repos := j.ListRepositories()
+	repos := j.repositoryMap()
 	result := []repository.Repository{}
-	for _, s := range repos {
-		trimmed := strings.TrimPrefix(s.GetRoot(), j.path+"/")
-		w := []rune(trimmed)
-		x, _ := FuzzyMatch(false, &w, []rune(term))
-		if x > 0 {
-			result = append(result, s)
-		}
+	candidates := []string{}
+	for k, _ := range repos {
+		candidates = append(candidates, k)
+	}
+	for _, s := range SortedMatches(term, candidates) {
+		result = append(result, repos[s])
 	}
 	return result
 }
