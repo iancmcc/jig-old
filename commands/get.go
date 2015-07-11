@@ -6,8 +6,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/iancmcc/go-flags"
 	"github.com/iancmcc/jig/repository"
-	"github.com/jessevdk/go-flags"
 )
 
 var _ flags.Commander = &Get{}

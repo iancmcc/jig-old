@@ -2,8 +2,9 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/jessevdk/go-flags"
+	"github.com/iancmcc/go-flags"
 )
 
 var (
@@ -25,6 +26,7 @@ type Dir struct {
 }
 
 func (t *SearchTerm) Complete(match string) []flags.Completion {
+	fmt.Println("FINDING FOR MATCH", match)
 	if err := d.Initialize(); err != nil {
 		return nil
 	}
@@ -34,6 +36,7 @@ func (t *SearchTerm) Complete(match string) []flags.Completion {
 	}
 	results := []flags.Completion{}
 	for _, s := range repos {
+		s = strings.TrimPrefix(s, curJig.Path()+"/")
 		results = append(results, flags.Completion{Item: s})
 	}
 	return results

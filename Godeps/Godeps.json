@@ -15,9 +15,9 @@
 			"Rev": "9b845074e8df7f75c89ebfd0b7ef49e283bda9f6"
 		},
 		{
-			"ImportPath": "github.com/jessevdk/go-flags",
-			"Comment": "v1-291-g15347ef",
-			"Rev": "15347ef417a300349807983f15af9e65cd2e1b3a"
+			"ImportPath": "github.com/iancmcc/go-flags",
+			"Comment": "v1-297-g1b89bf7",
+			"Rev": "1b89bf73cd2c3a911d7b2a279ab085c4a18cf539"
 		},
 		{
 			"ImportPath": "gopkg.in/check.v1",

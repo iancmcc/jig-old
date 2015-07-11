@@ -7,8 +7,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/iancmcc/go-flags"
 	"github.com/iancmcc/jig/jig"
-	"github.com/jessevdk/go-flags"
 )
 
 var (
@@ -29,7 +29,7 @@ func (j *jigroot_args) ResolveJig() (*jig.Jig, error) {
 		if jj, err := jig.FindClosestJig(j.Jigroot); err == nil {
 			log.WithFields(log.Fields{
 				"path": jj.Path(),
-			}).Info("Found jig root")
+			}).Debug("Found jig root")
 			return jj, err
 		}
 	}
@@ -53,6 +53,7 @@ func (j *jigroot_args) Initialize() error {
 	if curJig, err = j.ResolveJig(); err != nil {
 		return err
 	}
+	fmt.Println("JIG FOUND", curJig.Path())
 	return nil
 }
 
