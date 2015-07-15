@@ -53,7 +53,6 @@ func (j *jigroot_args) Initialize() error {
 	if curJig, err = j.ResolveJig(); err != nil {
 		return err
 	}
-	fmt.Println("JIG FOUND", curJig.Path())
 	return nil
 }
 
