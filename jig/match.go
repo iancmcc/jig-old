@@ -2,6 +2,7 @@ package jig
 
 import (
 	"container/heap"
+	"fmt"
 	"math"
 	"sort"
 	"strings"
@@ -47,6 +48,8 @@ func (h MatchHeap) ToStringArray() []string {
 	return result
 }
 
+// BestScore returns the best score for a candidate. Repo names are weighted
+// higher than owner names.
 func BestScore(term, candidate string) float64 {
 	n := strings.Count(term, "/")
 	if n > 0 {
@@ -58,8 +61,9 @@ func BestScore(term, candidate string) float64 {
 	i := 0.0
 	segments := strings.Split(candidate, "/")
 	sort.Reverse(sort.StringSlice(segments))
-	for _, s := range segments {
+	for j, s := range segments {
 		score := smetrics.JaroWinkler(term, s, 0.7, 4)
+		score = score * (1 + (float64(j) * 0.1))
 		i = math.Max(score, i)
 		if i == 1 {
 			break
@@ -77,5 +81,7 @@ func SortedMatches(term string, candidates []string) []string {
 			score: BestScore(term, s),
 		})
 	}
-	return matches.ToStringArray()
+	results := matches.ToStringArray()
+	fmt.Println(results)
+	return results
 }
