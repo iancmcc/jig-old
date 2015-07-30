@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/antzucaro/matchr"
+	"github.com/xrash/smetrics"
 )
 
 type Match struct {
@@ -53,13 +53,14 @@ func BestScore(term, candidate string) float64 {
 		split := strings.SplitN(candidate, "/", 3-n)
 		candidate = split[len(split)-1]
 		// Just return the score comparing the two
-		return matchr.JaroWinkler(term, candidate, true)
+		return smetrics.JaroWinkler(term, candidate, 0.7, 4)
 	}
 	i := 0.0
 	segments := strings.Split(candidate, "/")
 	sort.Reverse(sort.StringSlice(segments))
 	for _, s := range segments {
-		i = math.Max(matchr.JaroWinkler(term, s, true), i)
+		score := smetrics.JaroWinkler(term, s, 0.7, 4)
+		i = math.Max(score, i)
 		if i == 1 {
 			break
 		}

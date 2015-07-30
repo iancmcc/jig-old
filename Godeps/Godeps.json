@@ -11,13 +11,13 @@
 			"Rev": "cdd90c38c6e3718c731b555b9c3ed1becebec3ba"
 		},
 		{
-			"ImportPath": "github.com/antzucaro/matchr",
-			"Rev": "9b845074e8df7f75c89ebfd0b7ef49e283bda9f6"
-		},
-		{
 			"ImportPath": "github.com/iancmcc/go-flags",
 			"Comment": "v1-297-g1b89bf7",
 			"Rev": "1b89bf73cd2c3a911d7b2a279ab085c4a18cf539"
+		},
+		{
+			"ImportPath": "github.com/xrash/smetrics",
+			"Rev": "81a89232431423f9140fa413823ce3045f02f19c"
 		},
 		{
 			"ImportPath": "gopkg.in/check.v1",

@@ -26,7 +26,6 @@ type Dir struct {
 }
 
 func (t *SearchTerm) Complete(match string) []flags.Completion {
-	fmt.Println("FINDING FOR MATCH", match)
 	if err := d.Initialize(); err != nil {
 		return nil
 	}
