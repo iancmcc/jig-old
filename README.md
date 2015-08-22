@@ -1,5 +1,4 @@
-jig
-===
+# jig
 A multirepo tool
 
 jig handles the overhead of multiple repositories. It will clone them, keep
@@ -22,10 +21,11 @@ recreating environments programmatically.
     Check out the repository at URI into JIGROOT (defaults to closest ancestor
     JIGROOT)
 
-* ``jig find QUERY [-j JIGROOT]``
+* ``jig dir QUERY [-j JIGROOT]``
 
     Find a repository with fuzzy-matched SEARCHSTRING under JIGROOT (defaults to
-    closest ancestor jig). Outputs the path to that repo.
+    closest ancestor jig). Outputs the path to that repo. With no arguments,
+    outputs JIGROOT.
 
 * ``jig do [-q SEARCHSTRING [-q SEARCHSTRING]] [-r REPO [-r REPO]] [-j JIGROOT] COMMAND``
     For every repository matching the search string or repo specified, execute
@@ -35,10 +35,6 @@ recreating environments programmatically.
 
     Save the state of an existing JIGROOT to a JIGFILE so it can be reproduced
     later with “jig up".
-
-* ``jig root``
-
-    Outputs the closest ancestor JIGROOT.
 
 * ``jig bootstrap``
 
