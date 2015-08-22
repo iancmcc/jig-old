@@ -2,11 +2,9 @@ package jig
 
 import (
 	"container/heap"
-	"fmt"
-	"math"
-	"sort"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/xrash/smetrics"
 )
 
@@ -48,28 +46,46 @@ func (h MatchHeap) ToStringArray() []string {
 	return result
 }
 
-// BestScore returns the best score for a candidate. Repo names are weighted
-// higher than owner names.
-func BestScore(term, candidate string) float64 {
-	n := strings.Count(term, "/")
-	if n > 0 {
-		split := strings.SplitN(candidate, "/", 3-n)
-		candidate = split[len(split)-1]
-		// Just return the score comparing the two
-		return smetrics.JaroWinkler(term, candidate, 0.7, 4)
-	}
-	i := 0.0
-	segments := strings.Split(candidate, "/")
-	sort.Reverse(sort.StringSlice(segments))
-	for j, s := range segments {
-		score := smetrics.JaroWinkler(term, s, 0.7, 4)
-		score = score * (1 + (float64(j) * 0.1))
-		i = math.Max(score, i)
-		if i == 1 {
-			break
+func reverse(s []string) chan string {
+	c := make(chan string, 1)
+	go func() {
+		defer close(c)
+		n := len(s)
+		for i, _ := range s {
+			m := s[n-1-i]
+			if len(m) > 0 {
+				c <- m
+			}
 		}
+	}()
+	return c
+}
+
+// BestScore returns the best score for a candidate. Repo names are weighted
+// higher than owner names. They are then added together for the total.
+func BestScore(term, candidate string) float64 {
+	logger := log.WithFields(log.Fields{
+		"term":      term,
+		"candidate": candidate,
+	})
+	logger.Debug("Scoring term")
+	split := reverse(strings.Split(term, "/"))
+	candidates := reverse(strings.Split(candidate, "/"))
+
+	var (
+		a, b  string
+		score float64
+	)
+
+	for a = range split {
+		b = <-candidates
+		score += smetrics.JaroWinkler(a, b, 0.7, 4)
 	}
-	return i
+	for b = range candidates {
+		score += smetrics.JaroWinkler(a, b, 0.7, 4)
+	}
+	score += 2 * smetrics.JaroWinkler(term, candidate, 0.7, 4)
+	return score
 }
 
 func SortedMatches(term string, candidates []string) []string {
@@ -82,6 +98,5 @@ func SortedMatches(term string, candidates []string) []string {
 		})
 	}
 	results := matches.ToStringArray()
-	fmt.Println(results)
 	return results
 }
