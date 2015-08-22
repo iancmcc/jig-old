@@ -6,7 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/iancmcc/go-flags"
+	"github.com/jessevdk/go-flags"
 	"github.com/iancmcc/jig/repository"
 )
 

@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/iancmcc/go-flags"
+	"github.com/jessevdk/go-flags"
 )
 
 var completion string = `
