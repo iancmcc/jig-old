@@ -47,3 +47,11 @@ recreating environments programmatically.
     repositories. Add ``source $(jig bootstrap)`` to ``~/.bashrc``.
 
 
+## Build
+Building can be accomplished either by using ``go get`` or my using Go 1.5
+vendoring support. To do the latter, set:
+
+    GO15VENDOREXPERIMENT=1
+
+Then ``go build`` as normal.
+
